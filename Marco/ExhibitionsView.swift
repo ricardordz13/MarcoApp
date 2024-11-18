@@ -7,103 +7,53 @@
 
 import SwiftUI
 import Glur
+import SwiftData
 
-struct ExposicionesView: View {
-    
+struct ExhibitionsView: View {
+    @Environment(\.modelContext) var modelContext
+    @Query var viewModel: [Artwork]
     // Formatted Date
     @State private var currentDate: Date = Date()
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading) {
-                
-                HStack {
-                    // Encabezado
-                    Header(currentDate: $currentDate)
-                
-                    Spacer()
-                    
-                    Image(systemName: "person.circle.fill")
-                        .resizable()
-                        .frame(width: 40, height: 40)
-                }
-                .padding(.horizontal)
-                
-                // Obra del día
+        NavigationView {
+            ScrollView {
                 VStack(alignment: .leading) {
-                    Text("Obra del día")
-                        .font(.title2)
-                        .fontWeight(.semibold)
-                        .padding(.horizontal)
                     
-                    ZStack(alignment: .bottomLeading) {
-                        Image("paloma")
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .glur(radius: 8.0,
-                                  offset: 0.5,
-                                  interpolation: 0.3,
-                                  direction: .down
-                            )
-                            .overlay(
-                                LinearGradient(
-                                    gradient: Gradient(colors: [Color.clear, Color.black]),
-                                    startPoint: .center,
-                                    endPoint: .bottom
-                                )
-                                .opacity(1)
-                            )
-                            .cornerRadius(20)
-                            .clipped()
+                    HStack {
+                        // Encabezado
+                        Header(currentDate: $currentDate)
+                    
+                        Spacer()
                         
-                        LinearGradient(
-                            colors: [Color.black.opacity(0.7), Color.clear],
-                            startPoint: .bottom,
-                            endPoint: .center
-                        )
-                        .cornerRadius(20)
-                        
-                        VStack(alignment: .leading) {
-                            Text("La Paloma")
-                                .font(.title)
-                                .fontWeight(.bold)
-                                .foregroundColor(.white)
-                            
-                            Text("Juan Soriano")
-                                .font(.subheadline)
-                                .foregroundColor(.white)
-                            
-                            Text("La obra captura la esencia de una paloma en un estilo minimalista.")
-                                .font(.footnote)
-                                .foregroundColor(.white)
+                        NavigationLink(destination: PerfilView()) {
+                            Image(systemName: "person.circle.fill")
+                                .resizable()
+                                .frame(width: 40, height: 40)
                         }
-                        .padding()
                     }
                     .padding(.horizontal)
-                    .frame(maxWidth: .infinity,
-                           maxHeight: UIScreen.main.bounds.height * 0.5,
-                           alignment: .leading)
-                }
-                
-                // Exposición del mes
-                VStack(alignment: .leading) {
-                    Text("Exposición del mes")
-                        .font(.title2)
-                        .fontWeight(.semibold)
-                        .padding(.horizontal)
                     
-                    Image("expoMes") // Reemplazar con tu imagen
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(height: 200)
-                        .cornerRadius(20)
-                        .padding(.horizontal)
+                    // Obras del mes
+                    VStack(alignment: .leading) {
+                        Text("Obras del Mes")
+                            .font(.title2)
+                            .fontWeight(.semibold)
+                            .padding(.horizontal)
+                        
+                        ForEach(viewModel) { artwork in // Iterar sobre cada obra
+                            NavigationLink(destination: DetailsView(artwork: artwork)) {
+                                CardView(artwork: artwork)
+                            }
+                            .buttonStyle(PlainButtonStyle()) // Para evitar el efecto de botón en el CardView
+                        }
+                    }
                 }
+                .padding(.top)
             }
-            .padding(.top)
+            .background(Color(.systemBackground))
+            .navigationBarHidden(true)
         }
-        .background(Color(.systemBackground))
-        .navigationTitle("Exposiciones")
     }
 }
 
@@ -126,7 +76,7 @@ func Header(currentDate: Binding<Date>) -> some View { // Pass currentDate bindi
                     Text(currentDate.wrappedValue.format("YYYY")) // Use currentDate.wrappedValue
                         .font(.largeTitle)
                         .fontWeight(.bold)
-                        .foregroundColor(Color.teal)
+                        .foregroundColor(Color(hex: 0xED008C))
                 }
             }
             
@@ -138,6 +88,6 @@ func Header(currentDate: Binding<Date>) -> some View { // Pass currentDate bindi
 
 struct ExposicionesView_Previews: PreviewProvider {
     static var previews: some View {
-        ExposicionesView()
+        ExhibitionsView()
     }
 }
